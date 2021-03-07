@@ -489,7 +489,9 @@ class DharmaMachine:  # pylint: disable=too-many-instance-attributes
                 variables.append("\n")
 
         # Build content
+
         content = "".join(chain([self.prefix], variables, variances, [self.suffix]))
+
         if self.template:
             return Template(self.template).safe_substitute(testcase_content=content)
         return content
