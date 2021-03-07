@@ -70,7 +70,7 @@ class DharmaCommandLine:
         dharma.process_settings(args.settings)
         dharma.process_grammars(args.grammars)
         if args.storage:
-            dharma.generate_testcases(args.storage, args.format, args.count)
+            dharma.generate_testcases(args.storage, args.format, args.count, args.seed)
         elif args.server:
             server = DharmaWebSocketServer(dharma, (args.server_host, args.server_port))
             try:

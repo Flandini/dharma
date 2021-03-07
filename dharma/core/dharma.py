@@ -5,6 +5,8 @@ import os
 import re
 import sys
 import logging
+import json
+import time
 from string import Template
 from itertools import chain
 from collections import OrderedDict
@@ -496,7 +498,7 @@ class DharmaMachine:  # pylint: disable=too-many-instance-attributes
             return Template(self.template).safe_substitute(testcase_content=content)
         return content
 
-    def generate_testcases(self, path, filetype, count):
+    def generate_testcases(self, path, filetype, count, seed):
         """Writes out generated test cases to the provided path."""
         path = path.rstrip("/")
         try:
@@ -506,9 +508,21 @@ class DharmaMachine:  # pylint: disable=too-many-instance-attributes
             sys.exit(-1)
         for n in range(count):
             filename = os.path.join(path, "%d.%s" % (n + 1, filetype))
+            metadata_filename = os.path.join(path, f"{n+1}.metadata.json")
+            metadata = {}
+            
             try:
                 with open(filename, "w") as fo:
-                    fo.write(self.generate_content())
+                    start_time = time.time()
+                    content = self.generate_content()
+                    end_time = time.time()
+                    fo.write(content)
+                with open(metadata_filename, 'w') as fo:
+                    metadata['time_to_produce'] = end_time - start_time
+                    metadata['seed'] = seed
+                    metadata['index'] = n + 1
+                    metadata['timestamp'] = time.time()
+                    fo.write(json.dumps(metadata))
             except IOError:
                 logging.error("Failed in writing test case %s", filename)
                 sys.exit(-1)
